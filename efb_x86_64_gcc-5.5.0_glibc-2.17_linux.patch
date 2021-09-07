@@ -1,15 +1,3 @@
-diff -ru efb_x86_64_gcc-5.5.0_glibc-2.17_linux/include/limits.h efb_x86_64_gcc-5.5.0_glibc-2.17_linux/include/limits.h
---- /efb_x86_64_gcc-5.5.0_glibc-2.17_linux/include/limits.h	2021-08-26 18:51:05.353729547 +0800
-+++ /efb_x86_64_gcc-5.5.0_glibc-2.17_linux/include/limits.h	2021-08-26 18:50:06.401727165 +0800
-@@ -120,7 +120,7 @@
-     the definitions from gcc's header.  */
- #if defined __GNUC__ && !defined _GCC_LIMITS_H_
- /* `_GCC_LIMITS_H_' is what GCC's file defines.  */
--# include_next <limits.h>
-+/* # include_next <limits.h> */
- #endif
- 
- /* The <limits.h> files in some gcc versions don't define LLONG_MIN,
 diff -ru efb_x86_64_gcc-5.5.0_glibc-2.17_linux/lib/gcc/x86_64-linux-gnu/5.5.0/include-fixed/limits.h efb_x86_64_gcc-5.5.0_glibc-2.17_linux/lib/gcc/x86_64-linux-gnu/5.5.0/include-fixed/limits.h
 --- /efb_x86_64_gcc-5.5.0_glibc-2.17_linux/lib/gcc/x86_64-linux-gnu/5.5.0/include-fixed/limits.h	2021-08-26 18:52:07.653732064 +0800
 +++ /efb_x86_64_gcc-5.5.0_glibc-2.17_linux/lib/gcc/x86_64-linux-gnu/5.5.0/include-fixed/limits.h	2021-08-26 18:50:06.413727166 +0800
