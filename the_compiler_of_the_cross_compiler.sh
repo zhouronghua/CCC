@@ -3,8 +3,8 @@
 # File Name: the_compiler_of_the cross_compiler
 # Author: Ronghua Zhou
 # refer to wiki for the detailed information: 
-# http://wiki.enflame.cn/display/~ronghua.zhou/Cross-Compiler+Toolchains++---+ronghua.zhou
-# mail: ronghua.zhou@enflame-tech.com
+# https://www.cnblogs.com/zhouronghua/p/15236755.html
+# mail: zhou.ronghua@qq.com
 # Created Time: Fri Jul  30 11:17 2021
 #########################################################################
 
@@ -56,7 +56,7 @@ export VERSIONS_NEED_TO_DOWNLOAD=(${MPFR_URL} ${GMP_URL} ${MPC_URL} ${BINUTILS_U
 
 
 
-export COMPANY_PREFIX=efb
+export COMPANY_PREFIX=xxx
 export BASE_PATH=/opt/${COMPANY_PREFIX}
 # for x86_64
 export TAGET_ARCH=x86_64
@@ -72,14 +72,14 @@ export TARGET=${TAGET_ARCH}-${TARGET_OS}-gnu
 
 export LOG_FILE=~/the_compiler_of_the_cross_compiler.log
 export LOG_CMD_FILE=~/the_compiler_of_the_cross_compiler.cmd
-efb_log(){
+xxx_log(){
     echo `date +"%Y-%m-%d-%H:%M:%S" ` $* | tee -a ${LOG_FILE}
 }
-efb_command_log(){
+xxx_command_log(){
     echo `date +"%Y-%m-%d-%H:%M:%S" ` "$*" | tee -a ${LOG_CMD_FILE}
     if ! $* >> ${LOG_FILE} 2>&1
     then
-        efb_log "###########################exec [$*] fail########################"
+        xxx_log "###########################exec [$*] fail########################"
         exit 1
     fi
 }
@@ -92,15 +92,15 @@ if [ -e ${LOG_FILE} ]
 then
     mv ${LOG_CMD_FILE} ${LOG_CMD_FILE}.${TIMESTAMP}.bak
 fi
-efb_log "#########################################################################"
-efb_log "make the cross compiler for gcc version ${USE_GCC_VERSION} and glibc version ${USE_GLIBC_VERSION} and kernel ${KERNEL_VERSION} and target ${TARGET} at ${shell_base_dir} begin:"
-efb_log "#########################################################################"
+xxx_log "#########################################################################"
+xxx_log "make the cross compiler for gcc version ${USE_GCC_VERSION} and glibc version ${USE_GLIBC_VERSION} and kernel ${KERNEL_VERSION} and target ${TARGET} at ${shell_base_dir} begin:"
+xxx_log "#########################################################################"
 
 make_prepare(){
     # decide apt or yum to use
     if which apt >/dev/null 2>&1
     then
-        efb_command_log export PKG_INSTALL_TOOL=$(which apt)
+        xxx_command_log export PKG_INSTALL_TOOL=$(which apt)
         apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EB9B1D8886F44E2A
         apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3D5919B448457EE0
         apt install apt-transport-https
@@ -108,23 +108,23 @@ make_prepare(){
         apt -y upgrade
     elif which yum >/dev/null  2>&1
     then
-        efb_command_log export PKG_INSTALL_TOOL=$(which yum)
+        xxx_command_log export PKG_INSTALL_TOOL=$(which yum)
         yum -y update
     else
-        efb_log "unknown os, exit"
+        xxx_log "unknown os, exit"
         exit 1
     fi
-    efb_command_log ${PKG_INSTALL_TOOL} -y install libgmp-dev libmpfr-dev libmpc-dev  gcc g++ make gawk
+    xxx_command_log ${PKG_INSTALL_TOOL} -y install libgmp-dev libmpfr-dev libmpc-dev  gcc g++ make gawk
 
-    efb_log "make dir ${BUILD_DIR} begin!"
+    xxx_log "make dir ${BUILD_DIR} begin!"
     if [ !  -d ${BUILD_DIR} ]
     then
-        efb_command_log mkdir -p ${BUILD_DIR}
+        xxx_command_log mkdir -p ${BUILD_DIR}
     fi
-    efb_log "make dir ${BUILD_DIR} success!"
+    xxx_log "make dir ${BUILD_DIR} success!"
 
 
-    efb_command_log cd ${BUILD_DIR}
+    xxx_command_log cd ${BUILD_DIR}
 
     # import gpg fingerprint 
     if [ ! -f ${GNU_KEY} ]
@@ -140,67 +140,67 @@ make_prepare(){
     # download
     for version in ${VERSIONS_NEED_TO_DOWNLOAD[*]}
     do
-        efb_log "downlowd ${version}:"
+        xxx_log "downlowd ${version}:"
         file_name=$(echo ${version}|rev |cut -d "/" -f 1 | rev)
         if [ -f ${file_name} ]
         then
-            efb_command_log rm -f "${file_name}.sig"
-            efb_command_log wget "${version}.sig"
+            xxx_command_log rm -f "${file_name}.sig"
+            xxx_command_log wget "${version}.sig"
             if gpg --verify "${file_name}.sig" "${file_name}"
             then
-                efb_log "gpg verify ${version} success!"
+                xxx_log "gpg verify ${version} success!"
                 continue
             fi
         fi
-        efb_command_log rm -fr ${file_name}*
-        efb_command_log wget ${version}
-        efb_log "downlowd ${version} finished!"
+        xxx_command_log rm -fr ${file_name}*
+        xxx_command_log wget ${version}
+        xxx_log "downlowd ${version} finished!"
     done
 
     if [ ! -f ${KERNEL_VERSION}.tar.xz ]
     then
-        efb_command_log wget ${KERNEL_URL}
+        xxx_command_log wget ${KERNEL_URL}
     fi
 
 
-    efb_log "extract *.tar.xz begin!"
+    xxx_log "extract *.tar.xz begin!"
     for tar_file in *.tar.xz
     do
-        efb_log "extrace ${tar_file}"
-        efb_command_log tar -xf ${tar_file}
+        xxx_log "extrace ${tar_file}"
+        xxx_command_log tar -xf ${tar_file}
     done
 
     for tar_file in *.tar.gz
     do
-        efb_log "extrace ${tar_file}"
-        efb_command_log tar -xf ${tar_file}
+        xxx_log "extrace ${tar_file}"
+        xxx_command_log tar -xf ${tar_file}
     done
 
     # create soft link for mpfr, gmp, mpc
-    efb_command_log cd ${BUILD_DIR}/${USE_GCC_VERSION}
+    xxx_command_log cd ${BUILD_DIR}/${USE_GCC_VERSION}
     if [ ! -e mpfr ]
     then
-        efb_command_log ln -s ../${MPFR_VERSION} mpfr
+        xxx_command_log ln -s ../${MPFR_VERSION} mpfr
     fi
     if [ ! -e gmp ]
     then
-        efb_command_log ln -s ../${GMP_VERSION} gmp
+        xxx_command_log ln -s ../${GMP_VERSION} gmp
     fi
     if [ ! -e mpc ]
     then
-        efb_command_log ln -s ../${MPC_VERSION} mpc
+        xxx_command_log ln -s ../${MPC_VERSION} mpc
     fi
 
     # make build temp directories for gcc, glibc and binutils
     for gcc_glibc_dir in "${BUILD_DIR}/${USE_GCC_VERSION}" "${BUILD_DIR}/${USE_GLIBC_VERSION}" "${BUILD_DIR}/${BINUTILS_VERSION}";
     do
-        efb_command_log mkdir -p ${gcc_glibc_dir}/${TARGET_DIR_FOR_BUILD}
+        xxx_command_log mkdir -p ${gcc_glibc_dir}/${TARGET_DIR_FOR_BUILD}
     done
 
-    efb_log "make target dir ${TARGET_PATH} begin:"
-    efb_command_log mkdir -p ${TARGET_PATH} 
-    efb_command_log export PATH=${TARGET_PATH}/bin:$PATH
-    efb_log "new PATH is ${PATH}"
+    xxx_log "make target dir ${TARGET_PATH} begin:"
+    xxx_command_log mkdir -p ${TARGET_PATH} 
+    xxx_command_log export PATH=${TARGET_PATH}/bin:$PATH
+    xxx_log "new PATH is ${PATH}"
 
     # make patch for glibc 2.17
     sed -i "s/3.79\* | 3.\[89\]\*)/3.79\* | 3.\[89\]\* | 4.*)/" "${BUILD_DIR}/${USE_GLIBC_VERSION}/configure"
@@ -208,86 +208,86 @@ make_prepare(){
 
 
 make_binutils(){
-    efb_log "make binutils begin:"
-    efb_command_log cd ${BUILD_DIR}/${BINUTILS_VERSION}/${TARGET_DIR_FOR_BUILD} 
+    xxx_log "make binutils begin:"
+    xxx_command_log cd ${BUILD_DIR}/${BINUTILS_VERSION}/${TARGET_DIR_FOR_BUILD} 
 
-    efb_command_log ../configure --prefix=${TARGET_PATH} --target=${TARGET} --disable-multilib 
-    efb_command_log make -j20 
-    efb_command_log make install 
-    efb_log "make binutils finished!"
+    xxx_command_log ../configure --prefix=${TARGET_PATH} --target=${TARGET} --disable-multilib 
+    xxx_command_log make -j20 
+    xxx_command_log make install 
+    xxx_log "make binutils finished!"
 }
 
 
 make_kernel_headers(){
-    efb_log "kernel header files for ${KERNEL_VERSION} begin:"
-    efb_command_log cd ${BUILD_DIR}/${KERNEL_VERSION} 
-    efb_command_log make ARCH=${TAGET_ARCH_FOR_KERNEL} INSTALL_HDR_PATH=${TARGET_PATH} headers_install
-    efb_command_log make ARCH=${TAGET_ARCH_FOR_KERNEL} INSTALL_HDR_PATH=${TARGET_PATH}/${TARGET}/ headers_install
-    efb_log "kernel header files for ${KERNEL_VERSION} finished!"
+    xxx_log "kernel header files for ${KERNEL_VERSION} begin:"
+    xxx_command_log cd ${BUILD_DIR}/${KERNEL_VERSION} 
+    xxx_command_log make ARCH=${TAGET_ARCH_FOR_KERNEL} INSTALL_HDR_PATH=${TARGET_PATH} headers_install
+    xxx_command_log make ARCH=${TAGET_ARCH_FOR_KERNEL} INSTALL_HDR_PATH=${TARGET_PATH}/${TARGET}/ headers_install
+    xxx_log "kernel header files for ${KERNEL_VERSION} finished!"
 }
 
 
 make_gcc(){
-    efb_log "make gcc only ${USE_GCC_VERSION} begin:"
-    efb_command_log cd ${BUILD_DIR}/${USE_GCC_VERSION}/${TARGET_DIR_FOR_BUILD}
+    xxx_log "make gcc only ${USE_GCC_VERSION} begin:"
+    xxx_command_log cd ${BUILD_DIR}/${USE_GCC_VERSION}/${TARGET_DIR_FOR_BUILD}
 
-    efb_command_log ../configure  --prefix=${TARGET_PATH} --target=${TARGET} --with-glibc-version=${USE_GLIBC_ONLY_VERSION} --enable-languages=c,c++ --disable-multilib
-    efb_command_log make -j20 all-gcc
-    efb_command_log make install-gcc
-    efb_log "make gcc only ${USE_GCC_VERSION} finished!"
+    xxx_command_log ../configure  --prefix=${TARGET_PATH} --target=${TARGET} --with-glibc-version=${USE_GLIBC_ONLY_VERSION} --enable-languages=c,c++ --disable-multilib
+    xxx_command_log make -j20 all-gcc
+    xxx_command_log make install-gcc
+    xxx_log "make gcc only ${USE_GCC_VERSION} finished!"
 }
 
 make_glibc_headers(){
-    efb_log "make glibc ${USE_GLIBC_VERSION} headers begin:"
-    efb_command_log cd ${BUILD_DIR}/${USE_GLIBC_VERSION}/${TARGET_DIR_FOR_BUILD}
+    xxx_log "make glibc ${USE_GLIBC_VERSION} headers begin:"
+    xxx_command_log cd ${BUILD_DIR}/${USE_GLIBC_VERSION}/${TARGET_DIR_FOR_BUILD}
 
-    efb_command_log ../configure  --prefix=${TARGET_PATH} --build=${MACHTYPE} --host=${TARGET} --target=${TARGET} --disable-multilib libc_cv_forced_unwind=yes
-    efb_command_log make install-bootstrap-headers=yes install-headers
-    efb_command_log make -j20 csu/subdir_lib
-    efb_command_log install csu/crt1.o csu/crti.o csu/crtn.o ${TARGET_PATH}/lib
+    xxx_command_log ../configure  --prefix=${TARGET_PATH} --build=${MACHTYPE} --host=${TARGET} --target=${TARGET} --disable-multilib libc_cv_forced_unwind=yes
+    xxx_command_log make install-bootstrap-headers=yes install-headers
+    xxx_command_log make -j20 csu/subdir_lib
+    xxx_command_log install csu/crt1.o csu/crti.o csu/crtn.o ${TARGET_PATH}/lib
     # x86_64-linux-gnu-gcc
-    efb_command_log ${TAGET_ARCH}-${TARGET_OS}-gnu-gcc -nostdlib -nostartfiles -shared -x c /dev/null -o ${TARGET_PATH}/lib/libc.so
-    efb_command_log touch ${TARGET_PATH}/include/gnu/stubs.h
+    xxx_command_log ${TAGET_ARCH}-${TARGET_OS}-gnu-gcc -nostdlib -nostartfiles -shared -x c /dev/null -o ${TARGET_PATH}/lib/libc.so
+    xxx_command_log touch ${TARGET_PATH}/include/gnu/stubs.h
 
 
-    efb_command_log ../configure  --prefix=${TARGET_PATH}/${TARGET}/ --build=${MACHTYPE} --host=${TARGET} --target=${TARGET} --disable-multilib libc_cv_forced_unwind=yes
-    efb_command_log make install-bootstrap-headers=yes install-headers
-    efb_command_log make -j20 csu/subdir_lib
-    efb_command_log install csu/crt1.o csu/crti.o csu/crtn.o ${TARGET_PATH}/${TARGET}/lib
-    efb_command_log ${TAGET_ARCH}-${TARGET_OS}-gnu-gcc -nostdlib -nostartfiles -shared -x c /dev/null -o ${TARGET_PATH}/${TARGET}/lib/libc.so
-    efb_command_log touch ${TARGET_PATH}/${TARGET}/include/gnu/stubs.h
-    efb_log "make glibc ${USE_GLIBC_VERSION} headers finished!"
+    xxx_command_log ../configure  --prefix=${TARGET_PATH}/${TARGET}/ --build=${MACHTYPE} --host=${TARGET} --target=${TARGET} --disable-multilib libc_cv_forced_unwind=yes
+    xxx_command_log make install-bootstrap-headers=yes install-headers
+    xxx_command_log make -j20 csu/subdir_lib
+    xxx_command_log install csu/crt1.o csu/crti.o csu/crtn.o ${TARGET_PATH}/${TARGET}/lib
+    xxx_command_log ${TAGET_ARCH}-${TARGET_OS}-gnu-gcc -nostdlib -nostartfiles -shared -x c /dev/null -o ${TARGET_PATH}/${TARGET}/lib/libc.so
+    xxx_command_log touch ${TARGET_PATH}/${TARGET}/include/gnu/stubs.h
+    xxx_log "make glibc ${USE_GLIBC_VERSION} headers finished!"
 }
 
 
 make_libgcc(){
-    efb_log "make libgcc ${USE_GCC_VERSION} begin:"
-    efb_command_log cd ${BUILD_DIR}/${USE_GCC_VERSION}/${TARGET_DIR_FOR_BUILD}
+    xxx_log "make libgcc ${USE_GCC_VERSION} begin:"
+    xxx_command_log cd ${BUILD_DIR}/${USE_GCC_VERSION}/${TARGET_DIR_FOR_BUILD}
 
-    efb_command_log make -j20 all-target-libgcc
-    efb_command_log make install-target-libgcc
+    xxx_command_log make -j20 all-target-libgcc
+    xxx_command_log make install-target-libgcc
 
-    efb_log "make libgcc ${USE_GCC_VERSION} finished!"
+    xxx_log "make libgcc ${USE_GCC_VERSION} finished!"
 }
 
 make_glibc(){
-    efb_log "make glibc ${USE_GLIBC_VERSION} begin:"
-    efb_command_log cd ${BUILD_DIR}/${USE_GLIBC_VERSION}/${TARGET_DIR_FOR_BUILD}
+    xxx_log "make glibc ${USE_GLIBC_VERSION} begin:"
+    xxx_command_log cd ${BUILD_DIR}/${USE_GLIBC_VERSION}/${TARGET_DIR_FOR_BUILD}
 
-    efb_command_log make -j20
-    efb_command_log make install
+    xxx_command_log make -j20
+    xxx_command_log make install
 
-    efb_log "make glibc ${USE_GLIBC_VERSION} finished!"
+    xxx_log "make glibc ${USE_GLIBC_VERSION} finished!"
 }
 
 make_cpp_lib(){
-    efb_log "make std c++ library ${USE_GCC_VERSION} begin:"
-    efb_command_log cd ${BUILD_DIR}/${USE_GCC_VERSION}/${TARGET_DIR_FOR_BUILD}
+    xxx_log "make std c++ library ${USE_GCC_VERSION} begin:"
+    xxx_command_log cd ${BUILD_DIR}/${USE_GCC_VERSION}/${TARGET_DIR_FOR_BUILD}
 
-    efb_command_log make -j20
-    efb_command_log make install
+    xxx_command_log make -j20
+    xxx_command_log make install
 
-    efb_log "make std c++ library ${USE_GCC_VERSION} finished!"
+    xxx_log "make std c++ library ${USE_GCC_VERSION} finished!"
 }
 
 make_prepare
@@ -298,12 +298,12 @@ make_glibc_headers
 make_libgcc
 make_glibc
 make_cpp_lib
-efb_log "#########################################################################"
+xxx_log "#########################################################################"
 
-efb_log "make the cross compiler for gcc version ${USE_GCC_VERSION} and glibc version ${USE_GLIBC_VERSION} and kernel ${KERNEL_VERSION} and target ${TARGET} finished!"
+xxx_log "make the cross compiler for gcc version ${USE_GCC_VERSION} and glibc version ${USE_GLIBC_VERSION} and kernel ${KERNEL_VERSION} and target ${TARGET} finished!"
 
 if [ -f ${shell_base_dir}/${TARGET_DIR}.patch ]
 then
-    efb_command_log patch -i ${shell_base_dir}/${TARGET_DIR}.patch -p1 -d /opt/efb/
+    xxx_command_log patch -i ${shell_base_dir}/${TARGET_DIR}.patch -p1 -d /opt/xxx/
 fi
-efb_log "#########################################################################"
+xxx_log "#########################################################################"
