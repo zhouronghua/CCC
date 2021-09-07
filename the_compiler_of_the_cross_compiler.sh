@@ -77,10 +77,18 @@ xxx_log(){
 }
 xxx_command_log(){
     echo `date +"%Y-%m-%d-%H:%M:%S" ` "$*" | tee -a ${LOG_CMD_FILE}
-    if ! $* >> ${LOG_FILE} 2>&1
+    if ! "$@" >> ${LOG_FILE} 2>&1
     then
-        xxx_log "###########################exec [$*] fail########################"
+        xxx_log "###########################exec [$@] fail########################"
         exit 1
+    fi
+}
+
+xxx_command_ne_log(){
+    echo `date +"%Y-%m-%d-%H:%M:%S" ` "$*" | tee -a ${LOG_CMD_FILE}
+    if ! "$@" >> ${LOG_FILE} 2>&1
+    then
+        xxx_log "###########################exec [$@] fail########################"
     fi
 }
 TIMESTAMP=`date +"%Y%m%d%H%M%S"`
@@ -101,11 +109,11 @@ make_prepare(){
     if which apt >/dev/null 2>&1
     then
         xxx_command_log export PKG_INSTALL_TOOL=$(which apt)
-        apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EB9B1D8886F44E2A
-        apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3D5919B448457EE0
-        apt install apt-transport-https
-        apt -y update
-        apt -y upgrade
+        xxx_command_ne_log apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EB9B1D8886F44E2A
+        xxx_command_ne_log apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3D5919B448457EE0
+        xxx_command_ne_log apt install apt-transport-https
+        xxx_command_ne_log apt -y update
+        xxx_command_ne_log apt -y upgrade
     elif which yum >/dev/null  2>&1
     then
         xxx_command_log export PKG_INSTALL_TOOL=$(which yum)
@@ -203,7 +211,11 @@ make_prepare(){
     xxx_log "new PATH is ${PATH}"
 
     # make patch for glibc 2.17
-    sed -i "s/3.79\* | 3.\[89\]\*)/3.79\* | 3.\[89\]\* | 4.*)/" "${BUILD_DIR}/${USE_GLIBC_VERSION}/configure"
+    if [ ${USE_GLIBC_VERSION} == ${GLIBC17_VERSION} ]
+    then
+        xxx_command_ne_log sed -i "s/3.79\* | 3.\[89\]\*)/3.79\* | 3.\[89\]\* | 4.*)/" "${BUILD_DIR}/${USE_GLIBC_VERSION}/configure"
+        xxx_command_ne_log sed -i "s/\+force = force-install/#\+force = force-install/g" "${BUILD_DIR}/${USE_GLIBC_VERSION}/Makeconfig"
+    fi
 }
 
 
